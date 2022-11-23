@@ -21,15 +21,13 @@ def main():
     json_data = utils_cat.get_information(VARIABLES_URL)
     utils_cat.save_json(os.path.join(path, 'data', 'variables.json'), json_data)
 
-    """
-    path = os.getcwd()
     json_data = utils_cat.get_information(DATA_URL, {'$limit': 1000000}) #"data_lectura between '2015-01-10T12:00:00' and '2017-01-10T14:00:00'"
     utils_cat.save_json(os.path.join(path, 'data', 'prueba.json'), json_data)
 
     dict_data = utils_cat.process_data(os.path.join(path, 'data', 'prueba.csv'), json_data)    
     utils_cat.save_csv(os.path.join(path, 'data', 'prueba.csv'), dict_data)
-    """
+
     return 0
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     main()
