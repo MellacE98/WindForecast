@@ -4,12 +4,16 @@ TODO
 
 import etl
 import os
+import asyncio
+import aiohttp
+import time
+
 
 VARIABLES_URL = 'https://analisi.transparenciacatalunya.cat/resource/4fb2-n3yi.json'
 STATIONS_URL = 'https://analisi.transparenciacatalunya.cat/resource/yqwd-vj5e.json'
 DATA_URL = 'https://analisi.transparenciacatalunya.cat/resource/nzvn-apee.json'
 
-def main():
+async def main():
     """
     TODO
     
@@ -27,9 +31,12 @@ def main():
     dict_data = utils_cat.process_data(os.path.join(path, 'data', 'prueba.csv'), json_data)    
     utils_cat.save_csv(os.path.join(path, 'data', 'prueba.csv'), dict_data)
     """
-    #etl.extract(DATA_URL)
-    etl.load()
+    await etl.main_etl(DATA_URL)
     return 0
 
 if __name__ == '__main__':
-    main()
+    start = time.time()
+    asyncio.run(main())
+    end = time.time()
+
+    print(f"Took {end - start} seconds to pull websites.")

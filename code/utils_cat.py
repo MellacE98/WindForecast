@@ -6,7 +6,12 @@ import os
 import json
 import requests
 import pandas as pd
+from datetime import datetime, timedelta
 from pymongo import MongoClient
+import asyncio
+import aiohttp
+import time
+
 
 def create_directory(path):
     """Creates a directory at path
@@ -48,6 +53,28 @@ def get_information(url, parameters={}):
     if data.ok:
         return data.json()
     return None
+
+
+def get_information(url, parameters={}):
+    """Requests information from a url
+
+    Keyword arguments:
+    url -- url to get the info
+    parameters -- dict with the params for the request
+    """
+    data = requests.get(url, timeout=2.5, params=parameters)
+    if data.ok:
+        return data.json()
+    return None
+
+
+async def get(url, session):
+    try:
+        async with session.get(url=url) as response:
+            resp = await response.read()
+            print("Successfully got url with resp of length {}.".format(len(resp)))
+    except Exception as e:
+        print("Unable to get url {} due to {}.".format(url, e.__class__))
 
 
 def save_json(path, data):
@@ -95,6 +122,19 @@ def create_variables_dict():
     for var in v_data:
         v_dict[var['codi_variable']] = var['acronim']
     return v_dict
+
+
+def getParams(url, ini_date):
+    last_date = datetime.strptime('01/10/2009', '%d/%m/%Y')
+    ini_date = datetime.strptime(ini_date, '%d/%m/%Y')
+    dates = []
+    while ini_date < last_date:
+        end_date = ini_date + timedelta(days=1)
+        where = f"data_lectura between '{ini_date.isoformat()}' and '{end_date.isoformat()}'"
+        limit = 1000000
+        dates.append(url+f'?$limit={limit}&$where={where}')
+        ini_date = end_date
+    return dates
 
 
 def connectDB(URI):

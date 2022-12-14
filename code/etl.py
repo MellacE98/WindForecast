@@ -2,6 +2,10 @@
 TODO
 """
 
+
+import asyncio
+import aiohttp
+import time
 import os
 import pandas as pd
 from datetime import datetime, timedelta
@@ -9,27 +13,52 @@ import utils_cat
 
 path = os.getcwd()
 
-def extract(url, ini_date='01/01/2009'):
-    last_day = datetime.today()
-    if ini_date=='01/01/2009':
-        ini_date = datetime.strptime(ini_date, '%d/%m/%Y')
-    end_date = ini_date + timedelta(days=1)
-    if end_date > last_day:
-        print("Data is up to date")
-        return 1
-    parameters = {
-        '$where': f"data_lectura between '{ini_date.isoformat()}' and '{end_date.isoformat()}'",
-        '$limit': 1000000
-        } 
-    json_data = utils_cat.get_information(url, parameters)
-    utils_cat.save_json(os.path.join(path, 'data', 'prueba.json'), json_data)
-    return end_date
+async def worker(name, queue):
+    while True:
+        url = await queue.get()
 
+        # Visit the url
+        await asyncio.sleep(3)
 
-def transform():
+        # The item has been processed
+        queue.task_done()
+
     pass
 
 
-def load():
-    utils_cat.connectDB('mongodb://localhost:27017')
+async def main_etl(url):
+    """
+    TODO
+    """
+    # Create the url queue to get information from
+    url_queue = asyncio.Queue()
+
+    ### LLAMAR FUNCION QUE PILLA DE LA BD EL ULTIMO DIA MEDIDO, de momento 01/01/2009
+    ini_date = '01/01/2009'
+
+    for api_url in utils_cat.getParams(url, ini_date):
+        url_queue.put_nowait(api_url)
+
+    print(f'Workers initial sleep time {url_queue.qsize()*3:.2f} seconds')
+    # Workers that will visit the urls and fetch the data
+    tasks = []
+    for i in range(32):
+        task = asyncio.create_task(worker(f'worker_{i}', url_queue))
+        tasks.append(task)
+
+    # Wait for the urls to be processed
+    start = time.monotonic()
+    await url_queue.join()
+    total_time = time.monotonic() - start
+
+    # Cancel worker tasks
+    for task in tasks:
+        task.cancel()
     
+    # Wait for all the tasks to end and be cancelled
+    await asyncio.gather(*tasks, return_exceptions=True)
+
+    print(f'Workers visited fetched the information for {total_time:.2f} seconds')
+    print(url_queue.qsize())
+
+
