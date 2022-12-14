@@ -125,7 +125,7 @@ def create_variables_dict():
 
 
 def getParams(url, ini_date):
-    last_date = datetime.strptime('01/10/2009', '%d/%m/%Y')
+    last_date = datetime.strptime('30/01/2009', '%d/%m/%Y')
     ini_date = datetime.strptime(ini_date, '%d/%m/%Y')
     dates = []
     while ini_date < last_date:

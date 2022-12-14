@@ -14,14 +14,18 @@ import utils_cat
 path = os.getcwd()
 
 async def worker(name, queue):
-    while True:
-        url = await queue.get()
+    async with aiohttp.ClientSession() as session:
+        while True:
+            url = await queue.get()
 
-        # Visit the url
-        await asyncio.sleep(3)
-
-        # The item has been processed
-        queue.task_done()
+            try:
+                async with session.get(url=url) as response:
+                    json_response = await response.json()
+                    
+            except Exception as e:
+                print("Unable to get url {} due to {}.".format(url, e.__class__))
+            # The item has been processed
+            queue.task_done()
 
     pass
 
@@ -42,7 +46,7 @@ async def main_etl(url):
     print(f'Workers initial sleep time {url_queue.qsize()*3:.2f} seconds')
     # Workers that will visit the urls and fetch the data
     tasks = []
-    for i in range(32):
+    for i in range(8):
         task = asyncio.create_task(worker(f'worker_{i}', url_queue))
         tasks.append(task)
 
