@@ -2,7 +2,7 @@
 TODO
 """
 
-import utils_cat
+import etl
 import os
 
 VARIABLES_URL = 'https://analisi.transparenciacatalunya.cat/resource/4fb2-n3yi.json'
@@ -12,7 +12,7 @@ DATA_URL = 'https://analisi.transparenciacatalunya.cat/resource/nzvn-apee.json'
 def main():
     """
     TODO
-    """
+    
     path = os.getcwd()
     print(path)
     json_data = utils_cat.get_information(STATIONS_URL)
@@ -26,7 +26,9 @@ def main():
 
     dict_data = utils_cat.process_data(os.path.join(path, 'data', 'prueba.csv'), json_data)    
     utils_cat.save_csv(os.path.join(path, 'data', 'prueba.csv'), dict_data)
-
+    """
+    #etl.extract(DATA_URL)
+    etl.load()
     return 0
 
 if __name__ == '__main__':

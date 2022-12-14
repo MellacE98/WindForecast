@@ -6,7 +6,7 @@ import os
 import json
 import requests
 import pandas as pd
-
+from pymongo import MongoClient
 
 def create_directory(path):
     """Creates a directory at path
@@ -36,6 +36,7 @@ def clean_directories(path):
 # https://dev.socrata.com/foundry/analisi.transparenciacatalunya.cat/nzvn-apee
 # https://dev.socrata.com/docs/queries/
 # https://dev.socrata.com/docs/datatypes/floating_timestamp.html#,
+
 def get_information(url, parameters={}):
     """Requests information from a url
 
@@ -94,4 +95,9 @@ def create_variables_dict():
     for var in v_data:
         v_dict[var['codi_variable']] = var['acronim']
     return v_dict
-    
+
+
+def connectDB(URI):
+    client = MongoClient(URI)
+    print('success')
+    client.close()
