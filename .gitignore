@@ -1,5 +1,5 @@
 # matches any files and directories with the name test
-data/stations_data
-data/data_years
-venv/
-data/data_by_station/*.zip
+data/*
+!data/stations_data
+!data/wanted.txt
+code/__pycache__/*

@@ -169,27 +169,14 @@ def convert_data(data):
     
     df = df[WANTED_VARIABLES+['station', 'date']]
 
-    df['u2'], df['v2'] = [-1, -1]
-    df['u6'], df['v6'] = [-1, -1]
-    df['u10'], df['v10'] = [-1, -1]
-
-    df.loc[df['46'] != -1, 'u2'] = round(df.loc[df['46'] != -1, '46'] * df.loc[df['46'] != -1, '47'].apply(math.cos), 1)
-    df.loc[df['46'] != -1, 'v2'] = round(df.loc[df['46'] != -1, '46'] * df.loc[df['46'] != -1, '47'].apply(math.sin), 1)
-
-    df.loc[df['48'] != -1, 'u6'] = round(df.loc[df['48'] != -1, '48'] * df.loc[df['48'] != -1, '49'].apply(math.cos), 1)
-    df.loc[df['48'] != -1, 'v6'] = round(df.loc[df['48'] != -1, '48'] * df.loc[df['48'] != -1, '49'].apply(math.sin), 1)
-
-    df.loc[df['30'] != -1, 'u10'] = round(df.loc[df['30'] != -1, '30'] * df.loc[df['30'] != -1, '31'].apply(math.cos), 1)
-    df.loc[df['30'] != -1, 'v10'] = round(df.loc[df['30'] != -1, '30'] * df.loc[df['30'] != -1, '31'].apply(math.sin), 1)
-
     df = pd.merge(df, STATION_INFO, on='station', how='left')
 
     df['date'] = pd.to_datetime(df['date'])
 
     df.reset_index(drop=True, inplace=True)
     try:
-        df = df.drop(columns=['46', '47', '48', '49', '30', '31'])
-        df.rename({'32': 'T', '33': 'HR', '34':'P'}, axis='columns', inplace=True)
+        # df = df.drop(columns=['46', '47', '48', '49', '30', '31'])
+        df.rename({'32': 'T', '33': 'HR', '34':'P', '46': 'vel2', '47': 'ang2', '48': 'vel6', '49': 'ang6', '30': 'vel10', '31': 'ang10'}, axis='columns', inplace=True)
         return df, 0
     except KeyError:
         return df, -1
