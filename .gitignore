@@ -2,4 +2,6 @@
 data/*
 !data/stations_data
 !data/wanted.txt
+!data/variables.json
+!data/stations.json
 code/__pycache__/*
